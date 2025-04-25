@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Q&A Application Tests</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2 {
+            color: #2c3e50;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+        }
+        
+        .test-case {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-summary {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .run-tests-btn {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .run-tests-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Q&A Application Tests</h1>
+        
+        <button id="runTestsBtn" class="run-tests-btn">Run Tests</button>
+        
+        <div id="testResults" class="test-results"></div>
+    </div>
+
+    <script>
+        // Import the QA database and findAnswer function from the main application
+        // For testing purposes, we'll recreate the database and function here
+        const qaDatabase = [
+            {
+                question: "what is photosynthesis",
+                answer: "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll. It converts carbon dioxide and water into glucose and oxygen."
+            },
+            {
+                question: "how does gravity work",
+                answer: "Gravity is a force that attracts objects with mass toward each other. According to Newton's law of universal gravitation, every particle of matter in the universe attracts every other particle with a force that is directly proportional to the product of their masses and inversely proportional to the square of the distance between them."
+            },
+            {
+                question: "what is the pythagorean theorem",
+                answer: "The Pythagorean theorem states that in a right-angled triangle, the square of the length of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the other two sides. It is expressed as: a² + b² = c², where c is the hypotenuse."
+            },
+            {
+                question: "who was william shakespeare",
+                answer: "William Shakespeare (1564-1616) was an English poet, playwright, and actor, widely regarded as the greatest writer in the English language. He is often called England's national poet and the 'Bard of Avon'. His works include 39 plays, 154 sonnets, and other poems."
+            },
+            {
+                question: "what is the water cycle",
+                answer: "The water cycle, also known as the hydrologic cycle, is the continuous movement of water on, above, and below the surface of the Earth. It involves processes like evaporation, condensation, precipitation, infiltration, runoff, and subsurface flow."
+            },
+            {
+                question: "how do computers work",
+                answer: "Computers work by processing data through a series of instructions called programs. They use binary code (0s and 1s) to represent data and instructions. The main components include the CPU (Central Processing Unit), memory (RAM), storage devices, and input/output devices, all working together to execute tasks."
+            },
+            {
+                question: "what is the theory of evolution",
+                answer: "The theory of evolution by natural selection, first formulated by Charles Darwin, explains how species of living organisms adapt and change over time. It states that organisms with traits better suited to their environment are more likely to survive and reproduce, passing these traits to their offspring."
+            },
+            {
+                question: "what are the states of matter",
+                answer: "The four common states of matter are solid, liquid, gas, and plasma. In solids, particles are tightly packed; in liquids, they flow freely but maintain contact; in gases, they move independently; and in plasma, electrons are separated from nuclei."
+            }
+        ];
+        
+        function findAnswer(question) {
+            // Normalize the question (lowercase and trim)
+            const normalizedQuestion = question.toLowerCase().trim();
+            
+            // Find matching question in database
+            const matchingQA = qaDatabase.find(qa => 
+                qa.question.toLowerCase().includes(normalizedQuestion) || 
+                normalizedQuestion.includes(qa.question.toLowerCase())
+            );
+            
+            if (matchingQA) {
+                return matchingQA.answer;
+            } else {
+                return "Answer not available. Please ask your teacher.";
+            }
+        }
+        
+        // Test cases
+        const testCases = [
+            {
+                name: "Test exact match question",
+                question: "what is photosynthesis",
+                expectedAnswer: qaDatabase[0].answer,
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            },
+            {
+                name: "Test partial match question",
+                question: "tell me about photosynthesis",
+                expectedAnswer: qaDatabase[0].answer,
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            },
+            {
+                name: "Test case insensitivity",
+                question: "WHAT IS PHOTOSYNTHESIS",
+                expectedAnswer: qaDatabase[0].answer,
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            },
+            {
+                name: "Test question with extra spaces",
+                question: "  what is photosynthesis  ",
+                expectedAnswer: qaDatabase[0].answer,
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            },
+            {
+                name: "Test unknown question",
+                question: "what is quantum computing",
+                expectedAnswer: "Answer not available. Please ask your teacher.",
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            },
+            {
+                name: "Test empty question",
+                question: "",
+                expectedAnswer: "Answer not available. Please ask your teacher.",
+                test: function() {
+                    return findAnswer(this.question) === this.expectedAnswer;
+                }
+            }
+        ];
+        
+        // Function to run tests
+        function runTests() {
+            const testResultsElement = document.getElementById('testResults');
+            testResultsElement.innerHTML = '<h2>Test Results:</h2>';
+            
+            let passedTests = 0;
+            
+            testCases.forEach(testCase => {
+                const result = testCase.test();
+                const testCaseElement = document.createElement('div');
+                testCaseElement.className = `test-case ${result ? 'test-pass' : 'test-fail'}`;
+                
+                testCaseElement.innerHTML = `
+                    <strong>${testCase.name}</strong>: ${result ? 'PASS' : 'FAIL'}<br>
+                    Question: "${testCase.question}"<br>
+                    Expected: "${testCase.expectedAnswer}"<br>
+                    ${!result ? `Actual: "${findAnswer(testCase.question)}"` : ''}
+                `;
+                
+                testResultsElement.appendChild(testCaseElement);
+                
+                if (result) {
+                    passedTests++;
+                }
+            });
+            
+            const summaryElement = document.createElement('div');
+            summaryElement.className = 'test-summary';
+            summaryElement.textContent = `${passedTests} of ${testCases.length} tests passed`;
+            testResultsElement.appendChild(summaryElement);
+        }
+        
+        // Event listener for run tests button
+        document.getElementById('runTestsBtn').addEventListener('click', runTests);
+    </script>
+</body>
+</html>

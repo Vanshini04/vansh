@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Q&A Application</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .question-form {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .question-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        
+        .submit-btn {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .answer-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .answer-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .answer-text {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .not-found {
+            color: #e74c3c;
+            font-style: italic;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .question-input {
+                border-radius: 4px;
+                margin-bottom: 10px;
+            }
+            
+            .submit-btn {
+                border-radius: 4px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Q&A Application</h1>
+        
+        <div class="question-form">
+            <div class="input-group">
+                <input type="text" id="questionInput" class="question-input" placeholder="Type your question here...">
+                <button id="submitBtn" class="submit-btn">Submit</button>
+            </div>
+        </div>
+        
+        <div id="answerSection" class="answer-section hidden">
+            <h2>Answer:</h2>
+            <p id="answerText" class="answer-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for Q&A functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Predefined question-answer pairs
+            const qaDatabase = [
+                {
+                    question: "what is photosynthesis",
+                    answer: "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll. It converts carbon dioxide and water into glucose and oxygen."
+                },
+                {
+                    question: "how does gravity work",
+                    answer: "Gravity is a force that attracts objects with mass toward each other. According to Newton's law of universal gravitation, every particle of matter in the universe attracts every other particle with a force that is directly proportional to the product of their masses and inversely proportional to the square of the distance between them."
+                },
+                {
+                    question: "what is the pythagorean theorem",
+                    answer: "The Pythagorean theorem states that in a right-angled triangle, the square of the length of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the other two sides. It is expressed as: a² + b² = c², where c is the hypotenuse."
+                },
+                {
+                    question: "who was william shakespeare",
+                    answer: "William Shakespeare (1564-1616) was an English poet, playwright, and actor, widely regarded as the greatest writer in the English language. He is often called England's national poet and the 'Bard of Avon'. His works include 39 plays, 154 sonnets, and other poems."
+                },
+                {
+                    question: "what is the water cycle",
+                    answer: "The water cycle, also known as the hydrologic cycle, is the continuous movement of water on, above, and below the surface of the Earth. It involves processes like evaporation, condensation, precipitation, infiltration, runoff, and subsurface flow."
+                },
+                {
+                    question: "how do computers work",
+                    answer: "Computers work by processing data through a series of instructions called programs. They use binary code (0s and 1s) to represent data and instructions. The main components include the CPU (Central Processing Unit), memory (RAM), storage devices, and input/output devices, all working together to execute tasks."
+                },
+                {
+                    question: "what is the theory of evolution",
+                    answer: "The theory of evolution by natural selection, first formulated by Charles Darwin, explains how species of living organisms adapt and change over time. It states that organisms with traits better suited to their environment are more likely to survive and reproduce, passing these traits to their offspring."
+                },
+                {
+                    question: "what are the states of matter",
+                    answer: "The four common states of matter are solid, liquid, gas, and plasma. In solids, particles are tightly packed; in liquids, they flow freely but maintain contact; in gases, they move independently; and in plasma, electrons are separated from nuclei."
+                }
+            ];
+            
+            const questionInput = document.getElementById('questionInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const answerSection = document.getElementById('answerSection');
+            const answerText = document.getElementById('answerText');
+            
+            // Function to find answer for a question
+            function findAnswer(question) {
+                // Normalize the question (lowercase and trim)
+                const normalizedQuestion = question.toLowerCase().trim();
+                
+                // Find matching question in database
+                const matchingQA = qaDatabase.find(qa => 
+                    qa.question.toLowerCase().includes(normalizedQuestion) || 
+                    normalizedQuestion.includes(qa.question.toLowerCase())
+                );
+                
+                if (matchingQA) {
+                    return matchingQA.answer;
+                } else {
+                    return "Answer not available. Please ask your teacher.";
+                }
+            }
+            
+            // Event listener for submit button
+            submitBtn.addEventListener('click', function() {
+                const question = questionInput.value.trim();
+                
+                if (question) {
+                    const answer = findAnswer(question);
+                    
+                    // Display the answer
+                    answerText.textContent = answer;
+                    answerSection.classList.remove('hidden');
+                    
+                    // Add not-found class if answer is not available
+                    if (answer === "Answer not available. Please ask your teacher.") {
+                        answerText.classList.add('not-found');
+                    } else {
+                        answerText.classList.remove('not-found');
+                    }
+                }
+            });
+            
+            // Allow submitting with Enter key
+            questionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
